@@ -1,8 +1,6 @@
-import com.google.gson.Gson;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import javax.jms.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,17 +48,17 @@ public class Receiver {
     }
   }
 
-  public static void displayMessage(TextMessage msg) {
-    try {
-      System.out.println("JMSMessageID = " + msg.getJMSMessageID());
-      System.out.println("  JMSDestination = " + msg.getJMSDestination());
-      System.out.println("  Text = " + msg.getText());
-    } catch (JMSException e) {
-      System.out.println("sent: " + msg);
-    }
-  }
+  //  public static void displayMessage(TextMessage msg) {
+  //    try {
+  //      System.out.println("JMSMessageID = " + msg.getJMSMessageID());
+  //      System.out.println("  JMSDestination = " + msg.getJMSDestination());
+  //      System.out.println("  Text = " + msg.getText());
+  //    } catch (JMSException e) {
+  //      System.out.println("sent: " + msg);
+  //    }
+  //  }
 
-  public void replyMessage(int index, String body) throws JMSException {
+  public void replyMessage(int index, String body) {
     Message msg = messages.remove(index);
 
     onMessageChange.run();

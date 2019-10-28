@@ -3,13 +3,10 @@
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_11">
     <output-test url="file://$MODULE_DIR$/../../jsm-receiver/build/classes/java/test" />
     <exclude-output />
-    <content url="file://$MODULE_DIR$/../../jsm-receiver/src/test">
-      <sourceFolder url="file://$MODULE_DIR$/../../jsm-receiver/src/test/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/../../jsm-receiver/src/test/resources" type="java-test-resource" />
-    </content>
+    <content url="file://$MODULE_DIR$/../../jsm-receiver/src/test" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="jms-intro.jsm-receiver.main" />
+    <orderEntry type="module" module-name="SoT-jms-intro-2.jsm-receiver.main" />
     <orderEntry type="library" name="Gradle: org.apache.activemq:activemq-client:5.15.10" level="project" />
     <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.8.6" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.25" level="project" />

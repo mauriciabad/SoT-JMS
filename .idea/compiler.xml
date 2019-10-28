@@ -10,6 +10,10 @@
       <module name="jsm-receiver.test" target="11" />
       <module name="jsm-sender.main" target="11" />
       <module name="jsm-sender.test" target="11" />
+      <module name="SoT-jms-intro-2.jsm-receiver.main" target="11" />
+      <module name="SoT-jms-intro-2.jsm-receiver.test" target="11" />
+      <module name="SoT-jms-intro-2.jsm-sender.main" target="11" />
+      <module name="SoT-jms-intro-2.jsm-sender.test" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>

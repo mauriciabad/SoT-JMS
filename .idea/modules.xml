@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/jms-intro.jsm-receiver.main.iml" filepath="$PROJECT_DIR$/.idea/modules/jms-intro.jsm-receiver.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/jms-intro.jsm-receiver.test.iml" filepath="$PROJECT_DIR$/.idea/modules/jms-intro.jsm-receiver.test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/jms-intro.jsm-sender.main.iml" filepath="$PROJECT_DIR$/.idea/modules/jms-intro.jsm-sender.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/jms-intro.jsm-sender.test.iml" filepath="$PROJECT_DIR$/.idea/modules/jms-intro.jsm-sender.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SoT-jms-intro-2.jsm-receiver.main.iml" filepath="$PROJECT_DIR$/.idea/modules/SoT-jms-intro-2.jsm-receiver.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SoT-jms-intro-2.jsm-receiver.test.iml" filepath="$PROJECT_DIR$/.idea/modules/SoT-jms-intro-2.jsm-receiver.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SoT-jms-intro-2.jsm-sender.main.iml" filepath="$PROJECT_DIR$/.idea/modules/SoT-jms-intro-2.jsm-sender.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SoT-jms-intro-2.jsm-sender.test.iml" filepath="$PROJECT_DIR$/.idea/modules/SoT-jms-intro-2.jsm-sender.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/jsm-receiver.iml" filepath="$PROJECT_DIR$/.idea/modules/jsm-receiver.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/jsm-receiver.main.iml" filepath="$PROJECT_DIR$/.idea/modules/jsm-receiver.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/jsm-receiver.test.iml" filepath="$PROJECT_DIR$/.idea/modules/jsm-receiver.test.iml" />
