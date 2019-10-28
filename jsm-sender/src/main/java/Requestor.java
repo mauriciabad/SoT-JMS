@@ -1,20 +1,45 @@
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import javax.jms.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Requestor {
 
-  private static Session session;
-  private static Destination sendDestination;
-  private static MessageProducer producer;
+  private Session session;
+  private Destination sendDestination;
+  private MessageProducer producer;
 
-  public static void main(String[] args) {
+  private List<Message> messages = new ArrayList<Message>();
+  private List<String> messagesTitles = new ArrayList<String>();
+
+  private String name = Randomizer.getName();
+  private Color color = Randomizer.getColor();
+
+  private Runnable onMessageChange;
+
+  public Requestor(Runnable onMessageChange) {
+    this.onMessageChange = onMessageChange;
     init();
-    TextMessage msg = sendMessage("Hello, this is my first message!");
-    displayMessage(msg);
+
+//    try {
+//      consumer.setMessageListener(new MessageListener() {
+//        @Override
+//        public void onMessage(Message msg) {
+//          messages.add(msg);
+//          onMessageChange.run();
+//        }
+//      });
+//      connection.start(); // this is needed to start receiving messages
+//    } catch (JMSException e) {
+//      System.out.println("Error creating message listener");
+//      e.printStackTrace();
+//    }
   }
 
-  private static void init() {
+  private void init() {
     try {
       session = new ActiveMQConnectionFactory("tcp://localhost:61616").createConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);;
       sendDestination = session.createQueue("ChatGroup1");
@@ -25,18 +50,17 @@ public class Requestor {
     }
   }
 
-  private static void displayMessage(TextMessage msg) {
-    try {
-      //print only the attributes you want to see
-      System.out.println("JMSMessageID = " + msg.getJMSMessageID());
-      System.out.println("  JMSDestination = " + msg.getJMSDestination());
-      System.out.println("  Text = " + msg.getText());
-    } catch (JMSException e) {
-      System.out.println("sent: " + msg);
-    }
-  }
+  //  public static void displayMessage(TextMessage msg) {
+  //    try {
+  //      System.out.println("JMSMessageID = " + msg.getJMSMessageID());
+  //      System.out.println("  JMSDestination = " + msg.getJMSDestination());
+  //      System.out.println("  Text = " + msg.getText());
+  //    } catch (JMSException e) {
+  //      System.out.println("sent: " + msg);
+  //    }
+  //  }
 
-  public static TextMessage sendMessage(String body) {
+  public TextMessage sendMessage(String body) {
     TextMessage msg = null;
     try {
       msg = session.createTextMessage(body);
@@ -47,4 +71,21 @@ public class Requestor {
     }
     return msg;
   }
+
+  public List getMessages() {
+    return messages;
+  }
+
+  public List getMessagesTitles() {
+    return messages.stream().map(msg -> {
+      try {
+        return ((TextMessage) msg).getText();
+      } catch (JMSException e) {
+        return "Unreadable message";
+      }
+    }).collect(Collectors.toList());
+  }
+
+  public String getName() { return name; }
+  public Color getColor() { return color; }
 }
