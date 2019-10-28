@@ -25,6 +25,13 @@ public class ReceiverScreen {
     listModel.addAll(messages);
     requestsList.setModel(listModel);
     requestsList.updateUI();
+    requestsList.repaint();
+    requestsList.revalidate();
+    if (mainPanel != null) {
+      mainPanel.repaint();
+      mainPanel.revalidate();
+      mainPanel.updateUI();
+    }
   }
 
   public ReceiverScreen() {
@@ -109,4 +116,5 @@ public class ReceiverScreen {
   public JComponent $$$getRootComponent$$$() {
     return mainPanel;
   }
+
 }
