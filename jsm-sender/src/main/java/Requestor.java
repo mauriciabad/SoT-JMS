@@ -10,10 +10,14 @@ public class Requestor {
 
   private Session session;
   private Destination sendDestination;
+  private Destination receiveDestination;
+  private Connection connection;
   private MessageProducer producer;
+  private MessageConsumer consumer;
 
-  private List<Message> messages = new ArrayList<Message>();
-  private List<String> messagesTitles = new ArrayList<String>();
+  private List<Message> sentMessages = new ArrayList<Message>();
+  private List<Message> receivedMessages = new ArrayList<Message>();
+  private List<String> sentMessagesTitles = new ArrayList<String>();
 
   private String name = Randomizer.getName();
   private Color color = Randomizer.getColor();
@@ -24,26 +28,29 @@ public class Requestor {
     this.onMessageChange = onMessageChange;
     init();
 
-//    try {
-//      consumer.setMessageListener(new MessageListener() {
-//        @Override
-//        public void onMessage(Message msg) {
-//          messages.add(msg);
-//          onMessageChange.run();
-//        }
-//      });
-//      connection.start(); // this is needed to start receiving messages
-//    } catch (JMSException e) {
-//      System.out.println("Error creating message listener");
-//      e.printStackTrace();
-//    }
+    try {
+      consumer.setMessageListener(new MessageListener() {
+        @Override
+        public void onMessage(Message msg) {
+          receivedMessages.add(msg);
+          onMessageChange.run();
+        }
+      });
+      connection.start(); // this is needed to start receiving sentMessages
+    } catch (JMSException e) {
+      System.out.println("Error creating message listener");
+      e.printStackTrace();
+    }
   }
 
   private void init() {
     try {
-      session = new ActiveMQConnectionFactory("tcp://localhost:61616").createConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);;
-      sendDestination = session.createQueue("ChatGroup1");
+      connection = new ActiveMQConnectionFactory("tcp://localhost:61616").createConnection();
+      session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);;
+      sendDestination = session.createQueue("QueueToAdmin");
+      receiveDestination = session.createQueue("QueueTo"+name);
       producer = session.createProducer(sendDestination);
+      consumer = session.createConsumer(receiveDestination);
     } catch (JMSException e) {
       System.out.println("MQ not running in tcp://localhost:61616");
       e.printStackTrace();
@@ -64,6 +71,7 @@ public class Requestor {
     TextMessage msg = null;
     try {
       msg = session.createTextMessage(body);
+      msg.setJMSReplyTo(receiveDestination);
       producer.send(msg);
     } catch (JMSException e) {
       System.out.println("Error sending the message: " + body);
@@ -72,12 +80,11 @@ public class Requestor {
     return msg;
   }
 
-  public List getMessages() {
-    return messages;
-  }
+  public List getSentMessages() { return sentMessages; }
+  public List getReceivedMessages() { return receivedMessages; }
 
   public List getMessagesTitles() {
-    return messages.stream().map(msg -> {
+    return sentMessages.stream().map(msg -> {
       try {
         return ((TextMessage) msg).getText();
       } catch (JMSException e) {

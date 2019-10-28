@@ -29,7 +29,7 @@ public class Receiver {
           onMessageChange.run();
         }
       });
-      connection.start(); // this is needed to start receiving messages
+      connection.start();
     } catch (JMSException e) {
       System.out.println("Error creating message listener");
       e.printStackTrace();
@@ -40,7 +40,7 @@ public class Receiver {
     try {
       connection = new ActiveMQConnectionFactory("tcp://localhost:61616").createConnection();
       session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);;
-      sendDestination = session.createQueue("ChatGroup1");
+      sendDestination = session.createQueue("QueueToAdmin");
       consumer = session.createConsumer(sendDestination);
     } catch (JMSException e) {
       System.out.println("MQ not running in tcp://localhost:61616");
@@ -48,18 +48,19 @@ public class Receiver {
     }
   }
 
-  //  public static void displayMessage(TextMessage msg) {
-  //    try {
-  //      System.out.println("JMSMessageID = " + msg.getJMSMessageID());
-  //      System.out.println("  JMSDestination = " + msg.getJMSDestination());
-  //      System.out.println("  Text = " + msg.getText());
-  //    } catch (JMSException e) {
-  //      System.out.println("sent: " + msg);
-  //    }
-  //  }
-
   public void replyMessage(int index, String body) {
-    Message msg = messages.remove(index);
+    Message requestMsg = messages.remove(index);
+
+    TextMessage replyMsg = null;
+    try {
+      replyMsg = session.createTextMessage(body);
+      replyMsg.setJMSCorrelationID(requestMsg.getJMSMessageID());
+      MessageProducer producer = session.createProducer(requestMsg.getJMSReplyTo());
+      producer.send(requestMsg);
+    } catch (JMSException e) {
+      System.out.println("Error sending the message: " + body);
+      e.printStackTrace();
+    }
 
     onMessageChange.run();
   }

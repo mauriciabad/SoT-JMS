@@ -48,7 +48,7 @@ public class RequestorScreen {
 
   private void createUIComponents() {
     requestsList = new JList();
-    requestsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//    requestsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     nameLabel = new JLabel(requestor.getName());
     nameLabel.setForeground(requestor.getColor());
