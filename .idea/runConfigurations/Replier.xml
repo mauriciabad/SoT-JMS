@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Replier" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="Replier" />
+    <module name="jsm-receiver.main" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

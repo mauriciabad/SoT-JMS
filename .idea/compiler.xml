@@ -2,6 +2,10 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
+      <module name="jms-intro.jsm-receiver.main" target="11" />
+      <module name="jms-intro.jsm-receiver.test" target="11" />
+      <module name="jms-intro.jsm-sender.main" target="11" />
+      <module name="jms-intro.jsm-sender.test" target="11" />
       <module name="jsm-receiver.main" target="11" />
       <module name="jsm-receiver.test" target="11" />
       <module name="jsm-sender.main" target="11" />
