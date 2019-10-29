@@ -15,6 +15,7 @@ public class RequestorScreen {
   private JPanel mainPanel;
   private JLabel nameLabel;
 
+  private int testCount = 0;
   private DefaultListModel requestsListModel;
   private Requestor requestor = new Requestor(new Runnable() {
     @Override
@@ -33,10 +34,15 @@ public class RequestorScreen {
     this.frame = frame;
     frame.setTitle(requestor.getName() + " Travel Agency");
     sendButton.addActionListener(actionEvent -> {
-      if (!messageTextField.getText().equals("")) {
-        requestor.sendMessage(messageTextField.getText());
-        messageTextField.setText("");
+      String messageText;
+      if (messageTextField.getText().equals("")) {
+        messageText = "Test " + testCount;
+        ++testCount;
+      } else {
+        messageText = messageTextField.getText();
       }
+      requestor.sendMessage(messageText);
+      messageTextField.setText("");
     });
   }
 

@@ -32,8 +32,10 @@ public class ReceiverScreen {
     $$$setupUI$$$();
     this.frame = frame;
     sendButton.addActionListener(actionEvent -> {
-      if (requestsList.getSelectedIndex() != -1 && !messageTextField.getText().equals("")) {
-        receiver.replyMessage(requestsList.getSelectedIndex(), messageTextField.getText());
+      if (requestsList.getSelectedIndex() != -1) {
+        String replyText = "Works!";
+        if (!messageTextField.getText().equals("")) replyText = messageTextField.getText();
+        receiver.replyMessage(requestsList.getSelectedIndex(), replyText);
         messageTextField.setText("");
       }
     });
