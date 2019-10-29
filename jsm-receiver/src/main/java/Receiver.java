@@ -66,8 +66,9 @@ public class Receiver {
     sentJson.put("response", body);
       sentMsg = session.createTextMessage(sentJson.toString());
       sentMsg.setJMSCorrelationID(receivedMsg.getJMSMessageID());
-      sentMsg.setJMSDestination(receivedMsg.getJMSReplyTo());
-      producer.send(sentMsg.getJMSDestination(), sentMsg);
+      Destination returnAddress = receivedMsg.getJMSReplyTo();
+      sentMsg.setJMSDestination(returnAddress);
+      producer.send(returnAddress, sentMsg);
       sentMessages.put(receivedMsg.getJMSMessageID(), sentMsg);
     } catch (JMSException e) {
       System.out.println("Error sending the message: " + body);
