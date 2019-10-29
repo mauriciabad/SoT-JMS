@@ -63,7 +63,7 @@ public class ReceiverScreen {
   public static void main(String[] args) {
     JFrame frame = new JFrame("Flights Booking Agency");
     try {
-      frame.setIconImage(ImageIO.read(new File("img/faq.png")));
+      frame.setIconImage(ImageIO.read(new File("img/inbox-alt.png")));
     } catch (IOException e) {
     }
     frame.setContentPane(new ReceiverScreen().mainPanel);

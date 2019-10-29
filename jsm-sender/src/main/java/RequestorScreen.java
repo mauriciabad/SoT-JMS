@@ -37,7 +37,7 @@ public class RequestorScreen {
   public static void main(String[] args) {
     JFrame frame = new JFrame("Travel Agency");
     try {
-      frame.setIconImage(ImageIO.read(new File("img/help.png")));
+      frame.setIconImage(ImageIO.read(new File("img/email.png")));
     } catch (IOException e) {
     }
     frame.setContentPane(new RequestorScreen().mainPanel);
