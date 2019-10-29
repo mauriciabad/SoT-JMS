@@ -42,7 +42,7 @@
             </constraints>
             <properties>
               <enabled value="false"/>
-              <text value="Send"/>
+              <text value="Reply"/>
             </properties>
           </component>
         </children>
