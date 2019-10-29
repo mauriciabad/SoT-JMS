@@ -19,7 +19,6 @@ public class Requestor {
 
   private List<TextMessage> sentMessages = new ArrayList<TextMessage>();
   private Map<String,TextMessage> receivedMessages = new HashMap<String, TextMessage>();
-  private List<String> sentMessagesTitles = new ArrayList<String>();
 
   private String name = Randomizer.getName();
   private Color color = Randomizer.getColor();
@@ -35,7 +34,7 @@ public class Requestor {
         @Override
         public void onMessage(Message msg) {
           try {
-            receivedMessages.replace(msg.getJMSCorrelationID(), (TextMessage) msg);
+            receivedMessages.put(msg.getJMSCorrelationID(), (TextMessage) msg);
           } catch (JMSException e) {
             System.out.println("Error getting correlation id");
             e.printStackTrace();
@@ -90,10 +89,10 @@ public class Requestor {
         String response = "No response yet";
 
         if (receivedMessages.containsKey(msg.getJMSMessageID())){
-          response += receivedMessages.get(msg.getJMSMessageID()).getText();
+          response = receivedMessages.get(msg.getJMSMessageID()).getText();
         }
 
-        return author + ": " + response + " | " + question;
+        return author + ": " + question + " Support: " + response;
 
       } catch (JMSException e) {
         return "Unreadable message";

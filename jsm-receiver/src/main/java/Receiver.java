@@ -2,7 +2,9 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 
 import javax.jms.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Receiver {
@@ -12,8 +14,8 @@ public class Receiver {
   private Connection connection;
   private MessageConsumer consumer;
 
-  private List<TextMessage> messages = new ArrayList<TextMessage>();
-  private List<String> messagesTitles = new ArrayList<String>();
+  private Map<String,TextMessage> sentMessages= new HashMap<String, TextMessage>();
+  private List<TextMessage> receivedMessages = new ArrayList<TextMessage>();
 
   private Runnable onMessageChange;
 
@@ -25,7 +27,7 @@ public class Receiver {
       consumer.setMessageListener(new MessageListener() {
         @Override
         public void onMessage(Message msg) {
-          messages.add((TextMessage) msg);
+          receivedMessages.add((TextMessage) msg);
           onMessageChange.run();
         }
       });
@@ -49,14 +51,15 @@ public class Receiver {
   }
 
   public void replyMessage(int index, String body) {
-    TextMessage requestMsg = messages.remove(index);
+    TextMessage receivedMsg = receivedMessages.get(index);
 
-    TextMessage replyMsg = null;
+    TextMessage sentMsg = null;
     try {
-      replyMsg = session.createTextMessage(body);
-      replyMsg.setJMSCorrelationID(requestMsg.getJMSMessageID());
-      MessageProducer producer = session.createProducer(requestMsg.getJMSReplyTo());
-      producer.send(requestMsg);
+      sentMsg = session.createTextMessage(body);
+      sentMsg.setJMSCorrelationID(receivedMsg.getJMSMessageID());
+      MessageProducer producer = session.createProducer(receivedMsg.getJMSReplyTo());
+      producer.send(receivedMsg);
+      sentMessages.put(receivedMsg.getJMSMessageID(), sentMsg);
     } catch (JMSException e) {
       System.out.println("Error sending the message: " + body);
       e.printStackTrace();
@@ -65,18 +68,21 @@ public class Receiver {
     onMessageChange.run();
   }
 
-  public List getMessages() {
-    return messages;
-  }
+  public List<TextMessage> getReceivedMessages() { return receivedMessages; }
+  public Map<String, TextMessage> getSentMessages() { return sentMessages; }
 
   public List getMessagesTitles() {
-    return messages.stream().map(msg -> {
+    return receivedMessages.stream().map(msg -> {
       try {
         String question = msg.getText();
-        String author = "Anonymous";
+        String author = "Name";
         String response = "No response yet";
 
-        return author + ": " + question + " | You: " + response;
+        if (sentMessages.containsKey(msg.getJMSMessageID())){
+          response = sentMessages.get(msg.getJMSMessageID()).getText();
+        }
+
+        return author + ": " + question + " You: " + response;
 
       } catch (JMSException e) {
         return "Unreadable message";
