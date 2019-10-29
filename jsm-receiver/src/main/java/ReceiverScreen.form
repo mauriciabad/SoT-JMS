@@ -59,6 +59,7 @@
           <component id="c1fcd" class="javax.swing.JList" binding="requestsList" custom-create="true">
             <constraints/>
             <properties>
+              <font style="0"/>
               <selectionBackground color="-2236963"/>
             </properties>
           </component>

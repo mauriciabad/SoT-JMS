@@ -1,10 +1,14 @@
 import jdk.jfr.Frequency;
+import org.json.JSONObject;
 
 import javax.imageio.ImageIO;
+import javax.jms.JMSException;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.font.TextAttribute;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 public class RequestorScreen {
@@ -14,6 +18,7 @@ public class RequestorScreen {
   private JList requestsList;
   private JPanel mainPanel;
   private JLabel nameLabel;
+  private JButton sendImportantButton;
 
   private int testCount = 0;
   private DefaultListModel requestsListModel;
@@ -33,6 +38,7 @@ public class RequestorScreen {
     $$$setupUI$$$();
     this.frame = frame;
     frame.setTitle(requestor.getName() + " Travel Agency");
+
     sendButton.addActionListener(actionEvent -> {
       String messageText;
       if (messageTextField.getText().equals("")) {
@@ -42,6 +48,18 @@ public class RequestorScreen {
         messageText = messageTextField.getText();
       }
       requestor.sendMessage(messageText);
+      messageTextField.setText("");
+    });
+
+    sendImportantButton.addActionListener(actionEvent -> {
+      String messageText;
+      if (messageTextField.getText().equals("")) {
+        messageText = "Test " + testCount;
+        ++testCount;
+      } else {
+        messageText = messageTextField.getText();
+      }
+      requestor.sendMessage(messageText, true);
       messageTextField.setText("");
     });
   }
@@ -62,6 +80,32 @@ public class RequestorScreen {
     requestsList = new JList();
     requestsListModel = new DefaultListModel();
     requestsList.setModel(requestsListModel);
+    requestsList.setCellRenderer(new DefaultListCellRenderer() {
+      @Override
+      public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+        Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+        try {
+          String msgText = requestor.getSentMessages().get(index).getText();
+          JSONObject msgJson = new JSONObject(msgText);
+
+          try {
+            Boolean important = msgJson.getBoolean("important");
+            if (important) {
+              Font font = getFont();
+
+              font = font.deriveFont(
+                Collections.singletonMap(
+                  TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD));
+
+              setFont(font);
+            }
+          } catch (Exception e) {
+          }
+        } catch (JMSException e) {
+        }
+        return c;
+      }
+    });
 
     nameLabel = new JLabel(requestor.getName());
     nameLabel.setForeground(requestor.getColor());
@@ -81,7 +125,7 @@ public class RequestorScreen {
     mainPanel = new JPanel();
     mainPanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(3, 1, new Insets(8, 8, 8, 8), -1, -1));
     final JPanel panel1 = new JPanel();
-    panel1.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
+    panel1.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
     mainPanel.add(panel1, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
     messageTextField = new JTextField();
     messageTextField.setEnabled(true);
@@ -92,8 +136,13 @@ public class RequestorScreen {
     sendButton.setEnabled(true);
     sendButton.setText("Ask");
     panel1.add(sendButton, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    sendImportantButton = new JButton();
+    sendImportantButton.setText("⚠ Ask ⚠");
+    panel1.add(sendImportantButton, new com.intellij.uiDesigner.core.GridConstraints(0, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     final JScrollPane scrollPane1 = new JScrollPane();
     mainPanel.add(scrollPane1, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(350, 100), null, 0, false));
+    Font requestsListFont = this.$$$getFont$$$(null, Font.PLAIN, -1, requestsList.getFont());
+    if (requestsListFont != null) requestsList.setFont(requestsListFont);
     requestsList.setSelectionBackground(new Color(-2236963));
     scrollPane1.setViewportView(requestsList);
     final JPanel panel2 = new JPanel();
@@ -105,6 +154,25 @@ public class RequestorScreen {
     panel2.add(nameLabel, new com.intellij.uiDesigner.core.GridConstraints(0, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     final com.intellij.uiDesigner.core.Spacer spacer1 = new com.intellij.uiDesigner.core.Spacer();
     panel2.add(spacer1, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+  }
+
+  /**
+   * @noinspection ALL
+   */
+  private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
+    if (currentFont == null) return null;
+    String resultName;
+    if (fontName == null) {
+      resultName = currentFont.getName();
+    } else {
+      Font testFont = new Font(fontName, Font.PLAIN, 10);
+      if (testFont.canDisplay('a') && testFont.canDisplay('1')) {
+        resultName = fontName;
+      } else {
+        resultName = currentFont.getName();
+      }
+    }
+    return new Font(resultName, style >= 0 ? style : currentFont.getStyle(), size >= 0 ? size : currentFont.getSize());
   }
 
   /**

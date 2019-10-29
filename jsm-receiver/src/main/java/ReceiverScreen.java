@@ -5,9 +5,12 @@ import javax.jms.JMSException;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.synth.SynthStyle;
 import java.awt.*;
+import java.awt.font.TextAttribute;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 public class ReceiverScreen {
@@ -38,7 +41,16 @@ public class ReceiverScreen {
       if (requestsList.getSelectedIndex() != -1) {
         String replyText = "Works!";
         if (!messageTextField.getText().equals("")) replyText = messageTextField.getText();
-        receiver.replyMessage(requestsList.getSelectedIndex(), replyText);
+
+        Boolean important = false;
+        try {
+          String msgText = receiver.getReceivedMessages().get(requestsList.getSelectedIndex()).getText();
+          JSONObject msgJson = new JSONObject(msgText);
+          important = msgJson.getBoolean("important");
+        } catch (Exception e) {
+        }
+
+        receiver.replyMessage(requestsList.getSelectedIndex(), replyText, important);
         messageTextField.setText("");
       }
     });
@@ -84,8 +96,25 @@ public class ReceiverScreen {
         Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
         try {
           String msgText = receiver.getReceivedMessages().get(index).getText();
-          String hexColor = new JSONObject(msgText).getString("color");
+          JSONObject msgJson = new JSONObject(msgText);
+
+          try {
+            Boolean important = msgJson.getBoolean("important");
+            if (important) {
+              Font font = getFont();
+
+              font = font.deriveFont(
+                Collections.singletonMap(
+                  TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD));
+
+              setFont(font);
+            }
+          } catch (Exception e) {
+          }
+
+          String hexColor = msgJson.getString("color");
           setForeground(Color.decode(hexColor));
+
         } catch (JMSException e) {
         }
         return c;
@@ -123,8 +152,29 @@ public class ReceiverScreen {
     panel1.add(sendButton, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     final JScrollPane scrollPane1 = new JScrollPane();
     mainPanel.add(scrollPane1, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(350, 300), null, 0, false));
+    Font requestsListFont = this.$$$getFont$$$(null, Font.PLAIN, -1, requestsList.getFont());
+    if (requestsListFont != null) requestsList.setFont(requestsListFont);
     requestsList.setSelectionBackground(new Color(-2236963));
     scrollPane1.setViewportView(requestsList);
+  }
+
+  /**
+   * @noinspection ALL
+   */
+  private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
+    if (currentFont == null) return null;
+    String resultName;
+    if (fontName == null) {
+      resultName = currentFont.getName();
+    } else {
+      Font testFont = new Font(fontName, Font.PLAIN, 10);
+      if (testFont.canDisplay('a') && testFont.canDisplay('1')) {
+        resultName = fontName;
+      } else {
+        resultName = currentFont.getName();
+      }
+    }
+    return new Font(resultName, style >= 0 ? style : currentFont.getStyle(), size >= 0 ? size : currentFont.getSize());
   }
 
   /**
