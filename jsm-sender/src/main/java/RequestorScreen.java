@@ -12,6 +12,7 @@ public class RequestorScreen {
   private JPanel mainPanel;
   private JLabel nameLabel;
 
+  private DefaultListModel requestsListModel;
   private Requestor requestor = new Requestor(new Runnable() {
     @Override
     public void run() {
@@ -20,17 +21,17 @@ public class RequestorScreen {
   });
 
   private void updateRequestsList(List messages) {
-    DefaultListModel listModel = new DefaultListModel();
-    listModel.addAll(messages);
-    requestsList.setModel(listModel);
-    requestsList.updateUI();
+    requestsListModel.removeAllElements();
+    requestsListModel.addAll(messages);
   }
 
   public RequestorScreen() {
     $$$setupUI$$$();
     sendButton.addActionListener(actionEvent -> {
-      requestor.sendMessage(messageTextField.getText());
-      messageTextField.setText("");
+      if (!messageTextField.getText().equals("")) {
+        requestor.sendMessage(messageTextField.getText());
+        messageTextField.setText("");
+      }
     });
   }
 
@@ -48,7 +49,8 @@ public class RequestorScreen {
 
   private void createUIComponents() {
     requestsList = new JList();
-//    requestsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    requestsListModel = new DefaultListModel();
+    requestsList.setModel(requestsListModel);
 
     nameLabel = new JLabel(requestor.getName());
     nameLabel.setForeground(requestor.getColor());

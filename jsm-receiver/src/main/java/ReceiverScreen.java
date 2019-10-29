@@ -13,6 +13,7 @@ public class ReceiverScreen {
   private JList requestsList;
   private JPanel mainPanel;
 
+  private DefaultListModel requestsListModel;
   private Receiver receiver = new Receiver(new Runnable() {
     @Override
     public void run() {
@@ -21,23 +22,14 @@ public class ReceiverScreen {
   });
 
   private void updateRequestsList(List messages) {
-    DefaultListModel listModel = new DefaultListModel();
-    listModel.addAll(messages);
-    requestsList.setModel(listModel);
-    requestsList.updateUI();
-    requestsList.repaint();
-    requestsList.revalidate();
-    if (mainPanel != null) {
-      mainPanel.repaint();
-      mainPanel.revalidate();
-      mainPanel.updateUI();
-    }
+    requestsListModel.removeAllElements();
+    requestsListModel.addAll(messages);
   }
 
   public ReceiverScreen() {
     $$$setupUI$$$();
     sendButton.addActionListener(actionEvent -> {
-      if (requestsList.getSelectedIndex() != -1) {
+      if (requestsList.getSelectedIndex() != -1 && !messageTextField.getText().equals("")) {
         receiver.replyMessage(requestsList.getSelectedIndex(), messageTextField.getText());
         messageTextField.setText("");
       }
@@ -76,6 +68,8 @@ public class ReceiverScreen {
   private void createUIComponents() {
     requestsList = new JList();
     requestsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    requestsListModel = new DefaultListModel();
+    requestsList.setModel(requestsListModel);
 
     updateRequestsList(receiver.getMessagesTitles());
   }

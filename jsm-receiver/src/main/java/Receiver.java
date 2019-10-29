@@ -12,7 +12,7 @@ public class Receiver {
   private Connection connection;
   private MessageConsumer consumer;
 
-  private List<Message> messages = new ArrayList<Message>();
+  private List<TextMessage> messages = new ArrayList<TextMessage>();
   private List<String> messagesTitles = new ArrayList<String>();
 
   private Runnable onMessageChange;
@@ -25,7 +25,7 @@ public class Receiver {
       consumer.setMessageListener(new MessageListener() {
         @Override
         public void onMessage(Message msg) {
-          messages.add(msg);
+          messages.add((TextMessage) msg);
           onMessageChange.run();
         }
       });
@@ -49,7 +49,7 @@ public class Receiver {
   }
 
   public void replyMessage(int index, String body) {
-    Message requestMsg = messages.remove(index);
+    TextMessage requestMsg = messages.remove(index);
 
     TextMessage replyMsg = null;
     try {
@@ -72,7 +72,12 @@ public class Receiver {
   public List getMessagesTitles() {
     return messages.stream().map(msg -> {
       try {
-        return ((TextMessage) msg).getText();
+        String question = msg.getText();
+        String author = "Anonymous";
+        String response = "No response yet";
+
+        return author + ": " + question + " | You: " + response;
+
       } catch (JMSException e) {
         return "Unreadable message";
       }

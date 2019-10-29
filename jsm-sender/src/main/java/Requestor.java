@@ -3,7 +3,9 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import javax.jms.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Requestor {
@@ -15,8 +17,8 @@ public class Requestor {
   private MessageProducer producer;
   private MessageConsumer consumer;
 
-  private List<Message> sentMessages = new ArrayList<Message>();
-  private List<Message> receivedMessages = new ArrayList<Message>();
+  private List<TextMessage> sentMessages = new ArrayList<TextMessage>();
+  private Map<String,TextMessage> receivedMessages = new HashMap<String, TextMessage>();
   private List<String> sentMessagesTitles = new ArrayList<String>();
 
   private String name = Randomizer.getName();
@@ -32,7 +34,12 @@ public class Requestor {
       consumer.setMessageListener(new MessageListener() {
         @Override
         public void onMessage(Message msg) {
-          receivedMessages.add(msg);
+          try {
+            receivedMessages.replace(msg.getJMSCorrelationID(), (TextMessage) msg);
+          } catch (JMSException e) {
+            System.out.println("Error getting correlation id");
+            e.printStackTrace();
+          }
           onMessageChange.run();
         }
       });
@@ -57,36 +64,37 @@ public class Requestor {
     }
   }
 
-  //  public static void displayMessage(TextMessage msg) {
-  //    try {
-  //      System.out.println("JMSMessageID = " + msg.getJMSMessageID());
-  //      System.out.println("  JMSDestination = " + msg.getJMSDestination());
-  //      System.out.println("  Text = " + msg.getText());
-  //    } catch (JMSException e) {
-  //      System.out.println("sent: " + msg);
-  //    }
-  //  }
-
   public TextMessage sendMessage(String body) {
     TextMessage msg = null;
     try {
       msg = session.createTextMessage(body);
       msg.setJMSReplyTo(receiveDestination);
       producer.send(msg);
+      sentMessages.add(msg);
     } catch (JMSException e) {
       System.out.println("Error sending the message: " + body);
       e.printStackTrace();
     }
+    onMessageChange.run();
     return msg;
   }
 
-  public List getSentMessages() { return sentMessages; }
-  public List getReceivedMessages() { return receivedMessages; }
+  public List<TextMessage> getSentMessages() { return sentMessages; }
+  public Map<String, TextMessage> getReceivedMessages() { return receivedMessages; }
 
   public List getMessagesTitles() {
     return sentMessages.stream().map(msg -> {
       try {
-        return ((TextMessage) msg).getText();
+        String question = msg.getText();
+        String author = name;
+        String response = "No response yet";
+
+        if (receivedMessages.containsKey(msg.getJMSMessageID())){
+          response += receivedMessages.get(msg.getJMSMessageID()).getText();
+        }
+
+        return author + ": " + response + " | " + question;
+
       } catch (JMSException e) {
         return "Unreadable message";
       }
