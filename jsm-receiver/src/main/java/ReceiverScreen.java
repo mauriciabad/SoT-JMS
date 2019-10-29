@@ -12,12 +12,14 @@ public class ReceiverScreen {
   private JButton sendButton;
   private JList requestsList;
   private JPanel mainPanel;
+  private JFrame frame;
 
   private DefaultListModel requestsListModel;
   private Receiver receiver = new Receiver(new Runnable() {
     @Override
     public void run() {
       updateRequestsList(receiver.getMessagesTitles());
+      frame.toFront();
     }
   });
 
@@ -26,8 +28,9 @@ public class ReceiverScreen {
     requestsListModel.addAll(messages);
   }
 
-  public ReceiverScreen() {
+  public ReceiverScreen(JFrame frame) {
     $$$setupUI$$$();
+    this.frame = frame;
     sendButton.addActionListener(actionEvent -> {
       if (requestsList.getSelectedIndex() != -1 && !messageTextField.getText().equals("")) {
         receiver.replyMessage(requestsList.getSelectedIndex(), messageTextField.getText());
@@ -59,7 +62,7 @@ public class ReceiverScreen {
       frame.setIconImage(ImageIO.read(new File("img/inbox-alt.png")));
     } catch (IOException e) {
     }
-    frame.setContentPane(new ReceiverScreen().mainPanel);
+    frame.setContentPane(new ReceiverScreen(frame).mainPanel);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.pack();
     frame.setVisible(true);

@@ -1,4 +1,5 @@
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.json.JSONObject;
 
 import javax.jms.*;
 import java.awt.*;
@@ -64,9 +65,14 @@ public class Requestor {
   }
 
   public TextMessage sendMessage(String body) {
+    JSONObject json = new JSONObject();
+
+    json.put("name", name);
+    json.put("question", body);
+
     TextMessage msg = null;
     try {
-      msg = session.createTextMessage(body);
+      msg = session.createTextMessage(json.toString());
       msg.setJMSReplyTo(receiveDestination);
       msg.setJMSDestination(sendDestination);
       producer.send(msg);
@@ -85,15 +91,22 @@ public class Requestor {
   public List getMessagesTitles() {
     return sentMessages.stream().map(msg -> {
       try {
-        String question = msg.getText();
-        String author = name;
+        JSONObject sentJson = new JSONObject(msg.getText());
+
+        String question = sentJson.getString("question");
+        String name     = sentJson.getString("name");
         String response = "No response yet";
 
         if (receivedMessages.containsKey(msg.getJMSMessageID())){
-          response = receivedMessages.get(msg.getJMSMessageID()).getText();
+          String receivedMsgText = receivedMessages.get(msg.getJMSMessageID()).getText();
+
+          JSONObject receivedJson = new JSONObject(receivedMsgText);
+          question = receivedJson.getString("question");
+          name     = receivedJson.getString("name");
+          response = receivedJson.getString("response");
         }
 
-        return author + ": " + question + " Support: " + response;
+        return "You: " + question + " | Support: " + response;
 
       } catch (JMSException e) {
         return "Unreadable message";

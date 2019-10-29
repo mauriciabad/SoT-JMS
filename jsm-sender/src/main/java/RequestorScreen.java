@@ -1,3 +1,5 @@
+import jdk.jfr.Frequency;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -6,6 +8,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class RequestorScreen {
+  private JFrame frame;
   private JTextField messageTextField;
   private JButton sendButton;
   private JList requestsList;
@@ -25,8 +28,10 @@ public class RequestorScreen {
     requestsListModel.addAll(messages);
   }
 
-  public RequestorScreen() {
+  public RequestorScreen(JFrame frame) {
     $$$setupUI$$$();
+    this.frame = frame;
+    frame.setTitle(requestor.getName() + " Travel Agency");
     sendButton.addActionListener(actionEvent -> {
       if (!messageTextField.getText().equals("")) {
         requestor.sendMessage(messageTextField.getText());
@@ -41,7 +46,7 @@ public class RequestorScreen {
       frame.setIconImage(ImageIO.read(new File("img/email.png")));
     } catch (IOException e) {
     }
-    frame.setContentPane(new RequestorScreen().mainPanel);
+    frame.setContentPane(new RequestorScreen(frame).mainPanel);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.pack();
     frame.setVisible(true);

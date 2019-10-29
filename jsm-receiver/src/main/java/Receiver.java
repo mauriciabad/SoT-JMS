@@ -1,4 +1,5 @@
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.json.JSONObject;
 
 import javax.jms.*;
 import java.util.ArrayList;
@@ -54,10 +55,16 @@ public class Receiver {
 
   public void replyMessage(int index, String body) {
     TextMessage receivedMsg = receivedMessages.get(index);
-
     TextMessage sentMsg = null;
+
     try {
-      sentMsg = session.createTextMessage(body);
+    JSONObject receivedJson = new JSONObject(receivedMsg.getText());
+    JSONObject sentJson = new JSONObject();
+
+    sentJson.put("name", receivedJson.getString("name"));
+    sentJson.put("question", receivedJson.getString("question"));
+    sentJson.put("response", body);
+      sentMsg = session.createTextMessage(sentJson.toString());
       sentMsg.setJMSCorrelationID(receivedMsg.getJMSMessageID());
       sentMsg.setJMSDestination(receivedMsg.getJMSReplyTo());
       producer.send(sentMsg.getJMSDestination(), sentMsg);
@@ -76,15 +83,22 @@ public class Receiver {
   public List getMessagesTitles() {
     return receivedMessages.stream().map(msg -> {
       try {
-        String question = msg.getText();
-        String author = "Name";
+        JSONObject receivedJson = new JSONObject(msg.getText());
+
+        String question = receivedJson.getString("question");
+        String name     = receivedJson.getString("name");
         String response = "No response yet";
 
         if (sentMessages.containsKey(msg.getJMSMessageID())){
-          response = sentMessages.get(msg.getJMSMessageID()).getText();
-        }
+            String sendMsgText = sentMessages.get(msg.getJMSMessageID()).getText();
 
-        return author + ": " + question + " You: " + response;
+            JSONObject sendJson = new JSONObject(sendMsgText);
+            question = sendJson.getString("question");
+            name     = sendJson.getString("name");
+            response = sendJson.getString("response");
+          }
+
+        return name + ": " + question + " | You: " + response;
 
       } catch (JMSException e) {
         return "Unreadable message";
