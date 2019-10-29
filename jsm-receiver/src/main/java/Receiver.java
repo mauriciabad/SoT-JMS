@@ -10,9 +10,10 @@ import java.util.stream.Collectors;
 public class Receiver {
 
   private Session session;
-  private Destination sendDestination;
+  private Destination receiveDestination;
   private Connection connection;
   private MessageConsumer consumer;
+  private MessageProducer producer;
 
   private Map<String,TextMessage> sentMessages= new HashMap<String, TextMessage>();
   private List<TextMessage> receivedMessages = new ArrayList<TextMessage>();
@@ -42,8 +43,9 @@ public class Receiver {
     try {
       connection = new ActiveMQConnectionFactory("tcp://localhost:61616").createConnection();
       session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);;
-      sendDestination = session.createQueue("QueueToAdmin");
-      consumer = session.createConsumer(sendDestination);
+      receiveDestination = session.createQueue("QueueToAdmin");
+      consumer = session.createConsumer(receiveDestination);
+      producer = session.createProducer(null);
     } catch (JMSException e) {
       System.out.println("MQ not running in tcp://localhost:61616");
       e.printStackTrace();
@@ -57,8 +59,8 @@ public class Receiver {
     try {
       sentMsg = session.createTextMessage(body);
       sentMsg.setJMSCorrelationID(receivedMsg.getJMSMessageID());
-      MessageProducer producer = session.createProducer(receivedMsg.getJMSReplyTo());
-      producer.send(receivedMsg);
+      sentMsg.setJMSDestination(receivedMsg.getJMSReplyTo());
+      producer.send(sentMsg.getJMSDestination(), sentMsg);
       sentMessages.put(receivedMsg.getJMSMessageID(), sentMsg);
     } catch (JMSException e) {
       System.out.println("Error sending the message: " + body);

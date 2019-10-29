@@ -68,6 +68,7 @@ public class Requestor {
     try {
       msg = session.createTextMessage(body);
       msg.setJMSReplyTo(receiveDestination);
+      msg.setJMSDestination(sendDestination);
       producer.send(msg);
       sentMessages.add(msg);
     } catch (JMSException e) {
