@@ -58,12 +58,14 @@ public class Receiver {
     TextMessage sentMsg = null;
 
     try {
-    JSONObject receivedJson = new JSONObject(receivedMsg.getText());
-    JSONObject sentJson = new JSONObject();
+      JSONObject receivedJson = new JSONObject(receivedMsg.getText());
+      JSONObject sentJson = new JSONObject();
 
-    sentJson.put("name", receivedJson.getString("name"));
-    sentJson.put("question", receivedJson.getString("question"));
-    sentJson.put("response", body);
+      sentJson.put("name", receivedJson.getString("name"));
+      sentJson.put("question", receivedJson.getString("question"));
+      sentJson.put("response", body);
+      sentJson.put("color", receivedJson.getString("color"));
+
       sentMsg = session.createTextMessage(sentJson.toString());
       sentMsg.setJMSCorrelationID(receivedMsg.getJMSMessageID());
       Destination returnAddress = receivedMsg.getJMSReplyTo();
@@ -88,6 +90,7 @@ public class Receiver {
 
         String question = receivedJson.getString("question");
         String name     = receivedJson.getString("name");
+        String color    = receivedJson.getString("color");
         String response = "No response yet";
 
         if (sentMessages.containsKey(msg.getJMSMessageID())){
@@ -96,6 +99,7 @@ public class Receiver {
             JSONObject sendJson = new JSONObject(sendMsgText);
             question = sendJson.getString("question");
             name     = sendJson.getString("name");
+            color    = sendJson.getString("color");
             response = sendJson.getString("response");
           }
 

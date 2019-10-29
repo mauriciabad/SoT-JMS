@@ -67,7 +67,9 @@ public class Requestor {
   public TextMessage sendMessage(String body) {
     JSONObject json = new JSONObject();
 
+    String c = String.format("#%06X", (0xFFFFFF & color.getRGB()));
     json.put("name", name);
+    json.put("color", c);
     json.put("question", body);
 
     TextMessage msg = null;
@@ -95,6 +97,7 @@ public class Requestor {
 
         String question = sentJson.getString("question");
         String name     = sentJson.getString("name");
+        String color    = sentJson.getString("color");
         String response = "No response yet";
 
         if (receivedMessages.containsKey(msg.getJMSMessageID())){
@@ -103,6 +106,7 @@ public class Requestor {
           JSONObject receivedJson = new JSONObject(receivedMsgText);
           question = receivedJson.getString("question");
           name     = receivedJson.getString("name");
+          color    = receivedJson.getString("color");
           response = receivedJson.getString("response");
         }
 

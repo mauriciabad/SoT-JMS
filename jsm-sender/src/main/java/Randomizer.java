@@ -14,7 +14,7 @@ public class Randomizer {
     int g = (int) (Math.random()*256);
     int b = (int) (Math.random()*256);
 
-    if((299*r + 587*g + 114*b) / 1000 >= 3) return new Color(r, g, b);
+    if((299*r + 587*g + 114*b) / 1000 >= 4) return new Color(r, g, b);
     else return getColor();
   }
 
