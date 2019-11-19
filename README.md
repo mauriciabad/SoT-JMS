@@ -2,6 +2,8 @@
 
 ![Demo](img/demo.png)
 
+> Grade: 9
+
 ## Setup
 
 1. Install Java 11
